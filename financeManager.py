@@ -7,7 +7,7 @@ class FinanceManager:
     def __init__(self):
         self.database_manager = DatabaseManager()
         self.transactions = []
-        self.categories = [Category(1, "Food", "Expense"), Category(2, "Salary", "Income")]
+        self.categories = [Category(1, "Food", "expense"), Category(2, "Salary", "income")]
         self.id = 0
 
 
@@ -21,16 +21,43 @@ class FinanceManager:
         return date
 
     def input_type(self):
-        type = input("Enter the type of the transaction (income/expense): ")
-        return type
-    def input_category(self):
-        for i in self.categories:
-            print(i.category_id, i.category_name, i.category_type)
-            return i
-        return None
+        transaction_type = ""
+        valid = True
+        while valid:
+            transaction_type = input("Enter transaction type (income/expense): ").lower().strip()
+            if transaction_type not in ['income', 'expense']:
+                print("Invalid input. Try again")
+            else:
+                valid = False
 
-    def input_string(self):
-        description = input("Enter description: ")
+        return transaction_type
+
+    def input_category(self, chosen_type):
+
+        filtered = []
+
+        for category in self.categories:
+            if category.category_type == chosen_type:
+                filtered.append(category)
+
+        for index, category in enumerate (filtered, start = 1):
+            print(f"{index}) {category}")
+
+        choice = int(input("Enter the number from the list: "))
+        num = choice -1
+
+        return filtered[num]
+
+
+
+
+
+
+
+    def input_description(self):
+        description = input("Enter description or leave empty (optional): ")
+        if description == "":
+            description = ""
         return description
 
     def generate_id(self):
@@ -44,8 +71,8 @@ class FinanceManager:
         transaction_type = self.input_type()
         amount = self.input_amount()
         date = self.input_date()
-        category = self.input_category()
-        description = self.input_string()
+        category = self.input_category(transaction_type)
+        description = self.input_description()
         transaction_id = self.generate_id()
 
         transaction = Transaction(transaction_id, transaction_type, amount, category, date, description)
@@ -56,8 +83,11 @@ class FinanceManager:
 
 
     def show_transaction(self):
-        for i in self.transactions:
-            print(i.transaction_id, i.transaction_type)
+        for transaction in self.transactions:
+            print(f"ID: {transaction.transaction_id}) {transaction.transaction_type} for £{transaction.amount} in {transaction.category} from {transaction.date}")
+            if transaction.description:
+                print(f"Description: {transaction.description}")
+            print()
 
 
 

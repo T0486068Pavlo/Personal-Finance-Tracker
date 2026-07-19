@@ -5,3 +5,7 @@ class Category:
         self.category_type = category_type
 
 
+    def __str__(self):
+        return f"{self.category_name}"
+
+
