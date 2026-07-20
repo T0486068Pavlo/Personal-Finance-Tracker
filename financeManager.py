@@ -26,13 +26,16 @@ class FinanceManager:
 
 
     # Helper methods to validate user input
-    def input_amount(self, text):
+    def input_integer(self, text):
         amount = ''
         valid = False
         while not valid:
             try:
                 amount = int(input(text))
-                valid = True
+                if amount < 0:
+                    print("Cannot be less than 0. Try again")
+                else:
+                    valid = True
             except ValueError:
                 print("Invalid input. Try again")
 
@@ -127,7 +130,7 @@ class FinanceManager:
     #Method that collects all data and creates a transaction object
     def add_transaction(self):
         transaction_type = self.input_type("Enter transaction type (Income/Expense): ")
-        amount = self.input_amount("Enter amount: £")
+        amount = self.input_integer("Enter amount: £")
         date = self.input_date("Enter a date (DD/MM/YYYY): ")
         category = self.input_category(transaction_type, "Enter the number from the list: ")
         description = self.input_description("Enter description or leave empty (optional): ")
@@ -140,7 +143,7 @@ class FinanceManager:
     def list_transactions(self):
         if self.transactions:
             for transaction in self.transactions:
-                print(f"|ID: {transaction.transaction_id}| {transaction.transaction_type} for £{transaction.amount} in '{transaction.category}' from {transaction.date.strftime("%d/%m/%Y")}")
+                print(f"ID: {transaction.transaction_id}| {transaction.transaction_type} | £{transaction.amount} | {transaction.category}| {transaction.date.strftime("%d/%m/%Y")}")
                 if transaction.description:
                     print(f"Description: {transaction.description}")
                 print()
@@ -149,15 +152,14 @@ class FinanceManager:
 
 
 
-    def delete_transaction(self):
-        self.list_transactions()
-
+    def find_transaction_by_id(self, text):
+        found_transaction = ''
         if self.transactions:
             valid = False
             found = False
             while not valid:
                 try:
-                    choice = int(input("Enter the ID of the transaction you want to delete: "))
+                    choice = int(input(text))
                     for transaction in self.transactions:
                         if transaction.transaction_id == choice:
                             found_transaction = transaction
@@ -170,14 +172,95 @@ class FinanceManager:
                 except ValueError:
                     print("Invalid input. Try again")
 
+        return found_transaction
 
-            if found:
-                confirmation = self.input_confirmation("Please confirm the deletion (Y/N): ")
-                if confirmation:
-                    self.transactions.remove(found_transaction)
-                    print(f"Transaction with ID: {found_transaction.transaction_id} from ({found_transaction.transaction_type}) deleted")
-                else:
-                    print("Deletion cancelled")
+
+
+
+    def delete_transaction(self):
+        self.list_transactions()
+
+        found_transaction = self.find_transaction_by_id("Enter the ID of the transaction to delete: ")
+
+        confirmation = self.input_confirmation("Please confirm the deletion (Y/N): ")
+        if confirmation:
+            self.transactions.remove(found_transaction)
+            print(f"Transaction with ID: {found_transaction.transaction_id} from ({found_transaction.transaction_type}) deleted")
+        else:
+            print("Deletion cancelled")
+
+
+
+
+
+
+    def edit_transaction(self):
+
+        self.list_transactions()
+
+        found_transaction = self.find_transaction_by_id("Enter the ID of the transaction to edit: ")
+        running = True
+        while running:
+            print(f"Current transaction: \n")
+            print(f"Type: {found_transaction.transaction_type}")
+            print(f"Amount: {found_transaction.amount}")
+            print(f"Category: {found_transaction.category}")
+            print(f"Date: {found_transaction.date.strftime("%d/%m/%Y")}")
+            print(f"Description: {found_transaction.description or "-"}\n")
+
+
+            print("What would yoy like to edit: ")
+            print("1. Amount")
+            print("2. Category")
+            print("3. Date")
+            print("4. Description")
+            print("5. Cancel")
+
+            choice = self.input_integer("Enter the number from the menu: ")
+
+            match choice:
+
+                case 1:
+                    new_amount = self.input_integer("Enter the new amount: ")
+                    if new_amount == found_transaction.amount:
+                        print("No changes were made")
+                    else:
+                        found_transaction.amount = new_amount
+                        print(f"Amount changed to {new_amount}\n")
+                case 2:
+                    new_category = self.input_category(found_transaction.transaction_type,"Enter new category: ")
+                    if new_category == found_transaction.category:
+                        print("No changes were made")
+                    else:
+                        found_transaction.category = new_category
+                        print(f"Category changed to {new_category}\n")
+                case 3:
+                    new_date = self.input_date("Enter new date (DD/MM/YYYY): ")
+                    if new_date == found_transaction.date:
+                        print("No changes were made")
+                    else:
+                        found_transaction.date = new_date
+                        print(f"Date changed to {new_date.strftime("%d/%m/%Y")}\n")
+                case 4:
+                    new_description = self.input_description("Enter new description: ")
+                    found_transaction.description = new_description
+                    print(f"Description changed to {new_description}\n")
+
+                case 5:
+                    running = False
+                case _:
+                    print("Invalid input")
+
+
+
+
+
+
+
+
+
+
+
 
 
 
