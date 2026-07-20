@@ -14,11 +14,11 @@ class Menu:
             print("PERSONAL FINANCE TRACKER")
             print("1. Add transaction")
             print("2. Delete transaction")
-            print("3. Manage categories")
-            print("4. Edit transaction")
-            print("5. View all transactions")
-            print("6. Filter transactions")
-            print("7. Search transaction")
+            print("3. Edit transaction")
+            print("4. View all transactions")
+            print("5. Filter transactions")
+            print("6. Search transaction")
+            print("7. Manage categories")
             print("8. View statistics ")
             print("9. Exit")
 
@@ -30,9 +30,11 @@ class Menu:
 
                 case 1:
                     self.finance_manager.add_transaction()
+                case 2:
+                    pass
 
-                case 5:
-                    self.finance_manager.show_transaction()
+                case 4:
+                    self.finance_manager.list_transactions()
 
                 case 9:
                     print("Goodbye")
