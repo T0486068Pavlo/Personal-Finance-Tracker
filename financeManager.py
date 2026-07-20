@@ -141,12 +141,19 @@ class FinanceManager:
 
 
     def list_transactions(self):
+        print("=" * 95)
+        print(f"{'ID':<5} {'Type':<12} {'Amount':>10} {'Category':<18} {'Date':<15} {'Description':<25}")
+        print("=" * 95)
         if self.transactions:
             for transaction in self.transactions:
-                print(f"ID: {transaction.transaction_id}| {transaction.transaction_type} | £{transaction.amount} | {transaction.category}| {transaction.date.strftime("%d/%m/%Y")}")
-                if transaction.description:
-                    print(f"Description: {transaction.description}")
-                print()
+                print(
+                    f"{transaction.transaction_id:<5} "
+                    f"{transaction.transaction_type:<12} "
+                    f"£{transaction.amount:>11.2f} "
+                    f"{transaction.category.category_name:<18} "
+                    f"{transaction.date.strftime("%d/%m/%Y"):<15} "
+                    f"{transaction.description or '-'}"
+                )
         else:
             print("There are no transactions yet")
 
@@ -247,9 +254,46 @@ class FinanceManager:
                     print(f"Description changed to {new_description}\n")
 
                 case 5:
+                    print("Transaction updated\n")
                     running = False
                 case _:
                     print("Invalid input")
+
+
+    def search_transaction(self):
+        print("Search transactions: ")
+
+
+        running = True
+        while running:
+            print("1. By ID")
+            print("2. By Type")
+            print("3. By Category")
+            print("4. By Amount")
+            print("5. By Date")
+            print("6. Cancel")
+
+
+            choice = self.input_integer("Enter your choice: ")
+
+            match choice:
+                case 1:
+                    found_id = self.find_transaction_by_id("Enter the ID of the transaction to find: ")
+                    print(f"{found_id.transaction_id}| {found_id.transaction_type} | {found_id.category}| ")
+
+                case 2:
+                    found_type = self.input_type("Enter type of the transaction (Income/Expense): ")
+                    for trans in self.transactions:
+                        if trans.transaction_type == found_type:
+                            print(f"{trans.transaction_id}| {trans.transaction_type} | {trans.category}| ")
+
+                case 6:
+                    running = False
+
+                case _:
+                    print("Invalid input")
+
+
 
 
 

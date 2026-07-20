@@ -16,11 +16,10 @@ class Menu:
             print("2. Delete transaction")
             print("3. Edit transaction")
             print("4. View all transactions")
-            print("5. Filter transactions")
-            print("6. Search transaction")
-            print("7. Manage categories")
-            print("8. View statistics ")
-            print("9. Exit")
+            print("5. Search transaction")
+            print("6. Manage categories")
+            print("7. View statistics ")
+            print("8. Exit")
 
 
             choice = int(input("Enter your choice: "))
@@ -34,11 +33,12 @@ class Menu:
                     self.finance_manager.delete_transaction()
                 case 3:
                     self.finance_manager.edit_transaction()
-
                 case 4:
                     self.finance_manager.list_transactions()
+                case 5:
+                    self.finance_manager.search_transaction()
 
-                case 9:
+                case 8:
                     print("Goodbye")
                     running = False
 
