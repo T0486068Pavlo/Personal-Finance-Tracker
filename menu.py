@@ -31,7 +31,7 @@ class Menu:
                 case 1:
                     self.finance_manager.add_transaction()
                 case 2:
-                    pass
+                    self.finance_manager.delete_transaction()
 
                 case 4:
                     self.finance_manager.list_transactions()

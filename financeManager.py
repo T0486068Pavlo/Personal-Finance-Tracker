@@ -106,6 +106,22 @@ class FinanceManager:
         self.id+=1
         return self.id
 
+    def input_confirmation(self, text):
+        valid = False
+        confirmation = ''
+        while not valid:
+            choice = input(text)
+            if choice in ['y', 'Y']:
+                confirmation = True
+                valid = True
+            elif choice in ['n', 'N']:
+                confirmation = False
+                valid = True
+            else:
+                print("Invalid input. Try again")
+
+        return confirmation
+
 
 
     #Method that collects all data and creates a transaction object
@@ -134,7 +150,36 @@ class FinanceManager:
 
 
     def delete_transaction(self):
-        pass
+        self.list_transactions()
+
+        if self.transactions:
+            valid = False
+            found = False
+            while not valid:
+                try:
+                    choice = int(input("Enter the ID of the transaction you want to delete: "))
+                    for transaction in self.transactions:
+                        if transaction.transaction_id == choice:
+                            found_transaction = transaction
+                            found = True
+                            break
+                    if not found:
+                        print("This ID does not exist")
+                    else:
+                        valid = True
+                except ValueError:
+                    print("Invalid input. Try again")
+
+
+            if found:
+                confirmation = self.input_confirmation("Please confirm the deletion (Y/N): ")
+                if confirmation:
+                    self.transactions.remove(found_transaction)
+                    print(f"Transaction with ID: {found_transaction.transaction_id} from ({found_transaction.transaction_type}) deleted")
+                else:
+                    print("Deletion cancelled")
+
+
 
 
 
