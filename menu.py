@@ -39,7 +39,8 @@ class Menu:
                     self.finance_manager.search_transaction()
                 case 6:
                     self.finance_manager.manage_categories()
-
+                case 7:
+                    self.finance_manager.show_statistics()
                 case 8:
                     print("Goodbye")
                     running = False

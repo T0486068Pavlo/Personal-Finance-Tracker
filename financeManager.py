@@ -149,6 +149,27 @@ class FinanceManager:
 
         return found_transaction
 
+        # Helper function to display details of transaction
+
+    def display_info(self, trans):
+        print(f"ID: {trans.transaction_id}")
+        print(f"Type: {trans.transaction_type}")
+        print(f"Amount: {trans.amount}")
+        print(f"Category: {trans.category}")
+        print(f"Date: {trans.date.strftime("%d/%m/%Y")}")
+        print(f"Description: {trans.description or "-"}\n")
+        print()
+
+    def check_if_empty(self):
+        found = False
+        if self.transactions:
+            found = True
+        else:
+            print()
+            print("There are no transactions yet")
+            print()
+
+        return found
 
 
     #Method that collects all data and creates a transaction object
@@ -166,7 +187,7 @@ class FinanceManager:
 
     def list_transactions(self):
 
-        if self.transactions:
+        if self.check_if_empty():
             print("=" * 95)
             print(f"{'ID':<5} {'Type':<12} {'Amount':>10} {'Category':<18} {'Date':<15} {'Description':<25}")
             print("=" * 95)
@@ -177,25 +198,25 @@ class FinanceManager:
                     f"£{transaction.amount:>11.2f} "
                     f"{transaction.category.category_name:<18} "
                     f"{transaction.date.strftime("%d/%m/%Y"):<15} "
-                    f"{transaction.description or '-'}"
-                )
-        else:
-            print("There are no transactions yet")
+                    f"{transaction.description or '-'}")
+
+
 
 
 
     def delete_transaction(self):
-        self.list_transactions()
 
-        found_transaction = self.find_transaction_by_id("Enter the ID of the transaction to delete: ")
 
-        confirmation = self.input_confirmation("Please confirm the deletion (Y/N): ")
-        if confirmation:
-            self.transactions.remove(found_transaction)
-            print(f"Transaction with ID: {found_transaction.transaction_id} from ({found_transaction.transaction_type}) deleted")
-        else:
-            print("Deletion cancelled")
+        if self.check_if_empty():
+            self.list_transactions()
+            found_transaction = self.find_transaction_by_id("Enter the ID of the transaction to delete: ")
 
+            confirmation = self.input_confirmation("Please confirm the deletion (Y/N): ")
+            if confirmation:
+                self.transactions.remove(found_transaction)
+                print(f"Transaction with ID: {found_transaction.transaction_id} from ({found_transaction.transaction_type}) deleted")
+            else:
+                print("Deletion cancelled")
 
 
 
@@ -203,147 +224,147 @@ class FinanceManager:
 
     def edit_transaction(self):
 
-        self.list_transactions()
-
-        found_transaction = self.find_transaction_by_id("Enter the ID of the transaction to edit: ")
-        running = True
-        while running:
-            print(f"Current transaction: \n")
-            print(f"Type: {found_transaction.transaction_type}")
-            print(f"Amount: {found_transaction.amount}")
-            print(f"Category: {found_transaction.category}")
-            print(f"Date: {found_transaction.date.strftime("%d/%m/%Y")}")
-            print(f"Description: {found_transaction.description or "-"}\n")
 
 
-            print("What would yoy like to edit: ")
-            print("1. Amount")
-            print("2. Category")
-            print("3. Date")
-            print("4. Description")
-            print("5. Cancel")
+        if self.check_if_empty():
+            self.list_transactions()
+            found_transaction = self.find_transaction_by_id("Enter the ID of the transaction to edit: ")
+            running = True
+            while running:
+                self.display_info(found_transaction)
 
-            choice = self.input_integer("Enter the number from the menu: ")
 
-            match choice:
+                print("What would yoy like to edit: ")
+                print("1. Amount")
+                print("2. Category")
+                print("3. Date")
+                print("4. Description")
+                print("5. Cancel")
 
-                case 1:
-                    new_amount = self.input_integer("Enter the new amount: ")
-                    if new_amount == found_transaction.amount:
-                        print("No changes were made")
-                    else:
-                        found_transaction.amount = new_amount
-                        print(f"Amount changed to {new_amount}\n")
-                case 2:
-                    new_category = self.input_category(found_transaction.transaction_type,"Enter new category: ")
-                    if new_category == found_transaction.category:
-                        print("No changes were made")
-                    else:
-                        found_transaction.category = new_category
-                        print(f"Category changed to {new_category}\n")
-                case 3:
-                    new_date = self.input_date("Enter new date (DD/MM/YYYY): ")
-                    if new_date == found_transaction.date:
-                        print("No changes were made")
-                    else:
-                        found_transaction.date = new_date
-                        print(f"Date changed to {new_date.strftime("%d/%m/%Y")}\n")
-                case 4:
-                    new_description = self.input_description("Enter new description: ")
-                    found_transaction.description = new_description
-                    print(f"Description changed to {new_description}\n")
+                choice = self.input_integer("Enter the number from the menu: ")
 
-                case 5:
-                    print("Transaction updated\n")
-                    running = False
-                case _:
-                    print("Invalid input")
+                match choice:
+
+                    case 1:
+                        new_amount = self.input_integer("Enter the new amount: ")
+                        if new_amount == found_transaction.amount:
+                            print("No changes were made")
+                        else:
+                            found_transaction.amount = new_amount
+                            print(f"Amount changed to {new_amount}\n")
+                    case 2:
+                        new_category = self.input_category(found_transaction.transaction_type,"Enter new category: ")
+                        if new_category == found_transaction.category:
+                            print("No changes were made")
+                        else:
+                            found_transaction.category = new_category
+                            print(f"Category changed to {new_category}\n")
+                    case 3:
+                        new_date = self.input_date("Enter new date (DD/MM/YYYY): ")
+                        if new_date == found_transaction.date:
+                            print("No changes were made")
+                        else:
+                            found_transaction.date = new_date
+                            print(f"Date changed to {new_date.strftime("%d/%m/%Y")}\n")
+                    case 4:
+                        new_description = self.input_description("Enter new description: ")
+                        found_transaction.description = new_description
+                        print(f"Description changed to {new_description}\n")
+
+                    case 5:
+                        print("Transaction updated\n")
+                        running = False
+                    case _:
+                        print("Invalid input")
 
 
     def search_transaction(self):
-        print("Search transactions: ")
+
+        if self.check_if_empty():
+            print("Search transactions: ")
 
 
-        running = True
-        while running:
-            print("1. By ID")
-            print("2. By Type")
-            print("3. By Category")
-            print("4. By Amount")
-            print("5. By Date")
-            print("6. Cancel")
-            print()
+            running = True
+            while running:
+                print("1. By ID")
+                print("2. By Type")
+                print("3. By Category")
+                print("4. By Amount")
+                print("5. By Date")
+                print("6. Cancel")
+                print()
 
 
-            choice = self.input_integer("Enter your choice: ")
+                choice = self.input_integer("Enter your choice: ")
 
-            match choice:
-                case 1:
-                    find_id = self.find_transaction_by_id("Enter the ID of the transaction to find: ")
-                    print(f"ID: {find_id.transaction_id}| "
-                          f"Type: {find_id.transaction_type}|"
-                          f"Category: {find_id.category}|"
-                          f"Amount: {find_id.amount}|"
-                          f"Date: {find_id.date}|"
-                          f"Description {find_id.description or "-"}")
-                case 2:
-                    find_type = self.input_type("Enter type of the transaction (Income/Expense): ")
-                    for trans in self.transactions:
-                        if trans.transaction_type == find_type:
-                            print(f"ID: {trans.transaction_id}| "
-                                  f"Type: {trans.transaction_type}| "
-                                  f"Category: {trans.category}| "
-                                  f"Amount: {trans.amount}| "
-                                  f"Date: {trans.date}| "
-                                  f"Description: {trans.description or "-"}")
-                        else:
-                            print(f"No transactions for {find_type}")
+                match choice:
+                    case 1:
+                        find_id = self.find_transaction_by_id("Enter the ID of the transaction to find: ")
+                        print(f"ID: {find_id.transaction_id}| "
+                              f"Type: {find_id.transaction_type}|"
+                              f"Category: {find_id.category}|"
+                              f"Amount: {find_id.amount}|"
+                              f"Date: {find_id.date}|"
+                              f"Description {find_id.description or "-"}")
+                    case 2:
+                        find_type = self.input_type("Enter type of the transaction (Income/Expense): ")
+                        for trans in self.transactions:
+                            if trans.transaction_type == find_type:
+                                print(f"ID: {trans.transaction_id}| "
+                                      f"Type: {trans.transaction_type}| "
+                                      f"Category: {trans.category}| "
+                                      f"Amount: {trans.amount}| "
+                                      f"Date: {trans.date}| "
+                                      f"Description: {trans.description or "-"}")
+                            else:
+                                print(f"No transactions for {find_type}")
 
-                case 3:
-                    trans_type_find = self.input_type("Enter type of the transaction (Income/Expense): ")
-                    find_category = self.input_category(trans_type_find,"Enter category to search for: " )
-                    for trans in self.transactions:
-                        if trans.category == find_category:
-                            print(f"ID: {trans.transaction_id}| "
-                                  f"Type: {trans.transaction_type}| "
-                                  f"Category: {trans.category}| "
-                                  f"Amount: {trans.amount}| "
-                                  f"Date: {trans.date}| "
-                                  f"Description: {trans.description or "-"}")
-                        else:
-                            print(f"No transactions for {find_category}")
+                    case 3:
+                        trans_type_find = self.input_type("Enter type of the transaction (Income/Expense): ")
+                        find_category = self.input_category(trans_type_find,"Enter category to search for: " )
+                        for trans in self.transactions:
+                            if trans.category == find_category:
+                                print(f"ID: {trans.transaction_id}| "
+                                      f"Type: {trans.transaction_type}| "
+                                      f"Category: {trans.category}| "
+                                      f"Amount: {trans.amount}| "
+                                      f"Date: {trans.date}| "
+                                      f"Description: {trans.description or "-"}")
+                            else:
+                                print(f"No transactions for {find_category}")
 
-                case 4:
-                    min_amount = self.input_integer("Enter the minimum amount for range: ")
-                    max_amount= self.input_integer("Enter the maximum amount for range: ")
+                    case 4:
+                        min_amount = self.input_integer("Enter the minimum amount for range: ")
+                        max_amount= self.input_integer("Enter the maximum amount for range: ")
 
-                    for trans in self.transactions:
-                        if  min_amount <= trans.amount <= max_amount:
-                            print(f"ID: {trans.transaction_id}| "
-                                  f"Type: {trans.transaction_type}| "
-                                  f"Category: {trans.category}| "
-                                  f"Amount: {trans.amount}| "
-                                  f"Date: {trans.date}| "
-                                  f"Description: {trans.description or "-"}")
-                        else:
-                            print("No transaction found")
-                case 5:
-                    find_date = self.input_date("Enter date to find transaction: ")
-                    for trans in self.transactions:
-                        if trans.date == find_date:
-                            print(f"ID: {trans.transaction_id}| "
-                                  f"Type: {trans.transaction_type}| "
-                                  f"Category: {trans.category}| "
-                                  f"Amount: {trans.amount}| "
-                                  f"Date: {trans.date}| "
-                                  f"Description: {trans.description or "-"}")
-                        else:
-                            print(f"No transaction found for {find_date}")
-                case 6:
-                    running = False
+                        for trans in self.transactions:
+                            if  min_amount <= trans.amount <= max_amount:
+                                print(f"ID: {trans.transaction_id}| "
+                                      f"Type: {trans.transaction_type}| "
+                                      f"Category: {trans.category}| "
+                                      f"Amount: {trans.amount}| "
+                                      f"Date: {trans.date}| "
+                                      f"Description: {trans.description or "-"}")
+                            else:
+                                print("No transaction found")
+                    case 5:
+                        find_date = self.input_date("Enter date to find transaction: ")
+                        for trans in self.transactions:
+                            if trans.date == find_date:
+                                print(f"ID: {trans.transaction_id}| "
+                                      f"Type: {trans.transaction_type}| "
+                                      f"Category: {trans.category}| "
+                                      f"Amount: {trans.amount}| "
+                                      f"Date: {trans.date}| "
+                                      f"Description: {trans.description or "-"}")
+                            else:
+                                print(f"No transaction found for {find_date}")
+                    case 6:
+                        running = False
 
-                case _:
-                    print("Invalid input")
+                    case _:
+                        print("Invalid input")
+
 
     def list_categories(self):
         for category in self.categories:
@@ -435,6 +456,88 @@ class FinanceManager:
                     running = False
                 case _:
                     print("Invalid input")
+
+
+
+
+
+    def show_statistics(self):
+        total_income = 0
+        total_expense = 0
+        income_transactions = 0
+        expense_transactions = 0
+        largest_income = -1
+        largest_expense = -1
+        largest_expense_transaction = None
+        largest_income_transaction = None
+
+        for trans in self.transactions:
+            if trans.transaction_type == "income":
+                total_income +=trans.amount
+                income_transactions +=1
+                if trans.amount > largest_income:
+                    largest_income = trans.amount
+                    largest_income_transaction = trans
+
+            elif trans.transaction_type == "expense":
+                total_expense +=trans.amount
+                expense_transactions +=1
+                if trans.amount > largest_expense:
+                    largest_expense = trans.amount
+                    largest_expense_transaction = trans
+
+
+
+
+
+
+
+
+        print("-"*95)
+        print("Statistics")
+        print("="*95)
+        print(f"Total income: £{total_income}")
+        print(f"Total expense: £{total_expense}")
+        print(f"Current balance: £{total_income-total_expense}")
+        print(f"Income transactions: {income_transactions}")
+        print(f"Expense transactions: {expense_transactions}")
+        print()
+        if largest_income_transaction is not None:
+            print(f"Largest income: ")
+            self.display_info(largest_income_transaction)
+        if largest_expense_transaction is not None:
+            print(f"Largest expense: ")
+            self.display_info(largest_expense_transaction)
+
+
+        total = 0
+        most_expensive_category = None
+        biggest_total = 0
+
+        print("Spending of each category: ")
+        if self.transactions:
+            for c in self.categories:
+                for t in self.transactions:
+                    if t.category == c:
+                        total+=t.amount
+                if total !=0:
+                    print(f"Category: {c} | Total: £{total}")
+                if total > biggest_total:
+                    biggest_total = total
+                    most_expensive_category = c
+                total = 0
+
+            print(f"Most expensive category: {most_expensive_category} £({biggest_total})")
+        else:
+            print("No spending statistic available yet")
+
+
+
+        print("="*95)
+
+
+
+
 
 
 
