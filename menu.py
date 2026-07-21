@@ -37,6 +37,8 @@ class Menu:
                     self.finance_manager.list_transactions()
                 case 5:
                     self.finance_manager.search_transaction()
+                case 6:
+                    self.finance_manager.manage_categories()
 
                 case 8:
                     print("Goodbye")

@@ -165,10 +165,11 @@ class FinanceManager:
 
 
     def list_transactions(self):
-        print("=" * 95)
-        print(f"{'ID':<5} {'Type':<12} {'Amount':>10} {'Category':<18} {'Date':<15} {'Description':<25}")
-        print("=" * 95)
+
         if self.transactions:
+            print("=" * 95)
+            print(f"{'ID':<5} {'Type':<12} {'Amount':>10} {'Category':<18} {'Date':<15} {'Description':<25}")
+            print("=" * 95)
             for transaction in self.transactions:
                 print(
                     f"{transaction.transaction_id:<5} "
@@ -343,6 +344,100 @@ class FinanceManager:
 
                 case _:
                     print("Invalid input")
+
+    def list_categories(self):
+        for category in self.categories:
+            print(f"|ID {category.category_id}| {category} | {category.category_type}")
+            print()
+
+
+
+    def find_category_by_id(self, text):
+        found_category = ''
+        if self.categories:
+            valid = False
+            found = False
+            while not valid:
+                try:
+                    choice = int(input(text))
+                    for category in self.categories:
+                        if category.category_id == choice:
+                            found_category = category
+                            found = True
+                            break
+                    if not found:
+                        print("Category with this ID does not exist")
+                    else:
+                        valid = True
+                except ValueError:
+                    print("Invalid input. Try again")
+        return found_category
+
+
+    def manage_categories(self):
+
+        print("Manage categories: ")
+        running = True
+        while running:
+            print("1. View Categories")
+            print("2. Add Category")
+            print("3. Delete Category")
+            print("4. Cancel")
+            print()
+
+
+            choice = self.input_integer("Enter the number from the menu: ")
+
+            match choice:
+
+                case 1:
+                    self.list_categories()
+                case 2:
+                    cat_type = self.input_type("Enter category type (Income/Expense): ")
+                    cat_name = input("Enter category name: ")
+                    largest_id = 0
+                    for i in self.categories:
+                        if i.category_id > largest_id:
+                            largest_id = i.category_id
+                    new_id = largest_id +1
+                    print(f" Category -> ID: {new_id}| Name: {cat_name}| Type: {cat_type} added")
+                    self.categories.append(Category(new_id, cat_name,cat_type))
+
+                    self.list_categories()
+
+                case 3:
+                    self.list_categories()
+                    found = False
+                    #here I check if category with entered ID even exists
+                    category_to_delete = self.find_category_by_id("Enter the ID of category to delete: ")
+                    #here i look through transactions
+                    for transaction in self.transactions:
+                        if transaction.category == category_to_delete:
+                            found = True
+
+
+
+
+
+
+                    if not found:
+                        confirmation = self.input_confirmation("Are you sure to delete (Y/N):  ")
+                        if confirmation:
+                            self.categories.remove(category_to_delete)
+                            self.list_categories()
+
+                    else:
+                        print("This category contains transaction. Cannot be deleted")
+
+
+
+                case 4:
+                    running = False
+                case _:
+                    print("Invalid input")
+
+
+
 
 
 
