@@ -26,6 +26,7 @@ class FinanceManager:
 
 
     # Helper methods to validate user input
+
     def input_integer(self, text):
         amount = ''
         valid = False
@@ -126,6 +127,29 @@ class FinanceManager:
         return confirmation
 
 
+    def find_transaction_by_id(self, text):
+        found_transaction = ''
+        if self.transactions:
+            valid = False
+            found = False
+            while not valid:
+                try:
+                    choice = int(input(text))
+                    for transaction in self.transactions:
+                        if transaction.transaction_id == choice:
+                            found_transaction = transaction
+                            found = True
+                            break
+                    if not found:
+                        print("This ID does not exist")
+                    else:
+                        valid = True
+                except ValueError:
+                    print("Invalid input. Try again")
+
+        return found_transaction
+
+
 
     #Method that collects all data and creates a transaction object
     def add_transaction(self):
@@ -156,31 +180,6 @@ class FinanceManager:
                 )
         else:
             print("There are no transactions yet")
-
-
-
-    def find_transaction_by_id(self, text):
-        found_transaction = ''
-        if self.transactions:
-            valid = False
-            found = False
-            while not valid:
-                try:
-                    choice = int(input(text))
-                    for transaction in self.transactions:
-                        if transaction.transaction_id == choice:
-                            found_transaction = transaction
-                            found = True
-                            break
-                    if not found:
-                        print("This ID does not exist")
-                    else:
-                        valid = True
-                except ValueError:
-                    print("Invalid input. Try again")
-
-        return found_transaction
-
 
 
 
@@ -272,26 +271,81 @@ class FinanceManager:
             print("4. By Amount")
             print("5. By Date")
             print("6. Cancel")
+            print()
 
 
             choice = self.input_integer("Enter your choice: ")
 
             match choice:
                 case 1:
-                    found_id = self.find_transaction_by_id("Enter the ID of the transaction to find: ")
-                    print(f"{found_id.transaction_id}| {found_id.transaction_type} | {found_id.category}| ")
-
+                    find_id = self.find_transaction_by_id("Enter the ID of the transaction to find: ")
+                    print(f"ID: {find_id.transaction_id}| "
+                          f"Type: {find_id.transaction_type}|"
+                          f"Category: {find_id.category}|"
+                          f"Amount: {find_id.amount}|"
+                          f"Date: {find_id.date}|"
+                          f"Description {find_id.description or "-"}")
                 case 2:
-                    found_type = self.input_type("Enter type of the transaction (Income/Expense): ")
+                    find_type = self.input_type("Enter type of the transaction (Income/Expense): ")
                     for trans in self.transactions:
-                        if trans.transaction_type == found_type:
-                            print(f"{trans.transaction_id}| {trans.transaction_type} | {trans.category}| ")
+                        if trans.transaction_type == find_type:
+                            print(f"ID: {trans.transaction_id}| "
+                                  f"Type: {trans.transaction_type}| "
+                                  f"Category: {trans.category}| "
+                                  f"Amount: {trans.amount}| "
+                                  f"Date: {trans.date}| "
+                                  f"Description: {trans.description or "-"}")
+                        else:
+                            print(f"No transactions for {find_type}")
 
+                case 3:
+                    trans_type_find = self.input_type("Enter type of the transaction (Income/Expense): ")
+                    find_category = self.input_category(trans_type_find,"Enter category to search for: " )
+                    for trans in self.transactions:
+                        if trans.category == find_category:
+                            print(f"ID: {trans.transaction_id}| "
+                                  f"Type: {trans.transaction_type}| "
+                                  f"Category: {trans.category}| "
+                                  f"Amount: {trans.amount}| "
+                                  f"Date: {trans.date}| "
+                                  f"Description: {trans.description or "-"}")
+                        else:
+                            print(f"No transactions for {find_category}")
+
+                case 4:
+                    min_amount = self.input_integer("Enter the minimum amount for range: ")
+                    max_amount= self.input_integer("Enter the maximum amount for range: ")
+
+                    for trans in self.transactions:
+                        if  min_amount <= trans.amount <= max_amount:
+                            print(f"ID: {trans.transaction_id}| "
+                                  f"Type: {trans.transaction_type}| "
+                                  f"Category: {trans.category}| "
+                                  f"Amount: {trans.amount}| "
+                                  f"Date: {trans.date}| "
+                                  f"Description: {trans.description or "-"}")
+                        else:
+                            print("No transaction found")
+                case 5:
+                    find_date = self.input_date("Enter date to find transaction: ")
+                    for trans in self.transactions:
+                        if trans.date == find_date:
+                            print(f"ID: {trans.transaction_id}| "
+                                  f"Type: {trans.transaction_type}| "
+                                  f"Category: {trans.category}| "
+                                  f"Amount: {trans.amount}| "
+                                  f"Date: {trans.date}| "
+                                  f"Description: {trans.description or "-"}")
+                        else:
+                            print(f"No transaction found for {find_date}")
                 case 6:
                     running = False
 
                 case _:
                     print("Invalid input")
+
+
+
 
 
 
