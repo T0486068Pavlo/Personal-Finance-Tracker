@@ -1,8 +1,10 @@
+from databaseManager import DatabaseManager
 from financeManager import FinanceManager
 from menu import Menu
 
-
-financeManager = FinanceManager()
+databaseManager = DatabaseManager()
+databaseManager.create_tables()
+financeManager = FinanceManager(databaseManager)
 
 menu = Menu(financeManager)
 

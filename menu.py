@@ -43,6 +43,7 @@ class Menu:
                     self.finance_manager.show_statistics()
                 case 8:
                     print("Goodbye")
+                    self.finance_manager.close_database()
                     running = False
 
 

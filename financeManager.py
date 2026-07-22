@@ -5,8 +5,8 @@ from datetime import datetime
 
 class FinanceManager:
 
-    def __init__(self):
-        self.database_manager = DatabaseManager()
+    def __init__(self, database_manager):
+        self.database_manager = database_manager
         self.transactions = []
         self.categories = [Category(1, "Food", "expense"),
                            Category(2, "Entertainment", "expense"),
@@ -22,7 +22,9 @@ class FinanceManager:
                            Category(12, "Freelance", "income")]
         self.id = 0
 
-
+    #DatabaseManager helper method
+    def close_database(self):
+        self.database_manager.close_connection()
 
 
     # Helper methods to validate user input
