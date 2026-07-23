@@ -6,6 +6,8 @@ databaseManager = DatabaseManager()
 databaseManager.create_tables()
 financeManager = FinanceManager(databaseManager)
 financeManager.user_handler()
+financeManager.initialize_default_categories()
+financeManager.load_categories()
 
 menu = Menu(financeManager)
 

@@ -11,24 +11,9 @@ class FinanceManager:
     def __init__(self, database_manager):
         self.database_manager = database_manager
         self.transactions = []
-        self.categories = [Category(1, "Food", "expense"),
-                           Category(2, "Entertainment", "expense"),
-                           Category(3, "Transport", "expense"),
-                           Category(4, "Shopping", "expense"),
-                           Category(5, "Housing", "expense"),
-                           Category(6, "Education", "expense"),
-                           Category(7, "Travel", "expense"),
-                           Category(8, "Salary", "income"),
-                           Category(9, "Gift", "income"),
-                           Category(10, "Bonus", "income"),
-                           Category(11, "Investment", "income"),
-                           Category(12, "Freelance", "income")]
-        self.id = 0
+        self.categories = []
+        # self.id = 0
 
-
-    #DatabaseManager helper method
-    def close_database(self):
-        self.database_manager.close_connection()
 
 
     # Helper methods to validate user input
@@ -112,9 +97,9 @@ class FinanceManager:
             description = ""
         return description
 
-    def generate_id(self):
-        self.id+=1
-        return self.id
+    # def generate_id(self):
+    #     self.id+=1
+    #     return self.id
 
     def input_confirmation(self, text):
         valid = False
@@ -177,19 +162,6 @@ class FinanceManager:
 
         return found
 
-    def user_handler(self):
-        row = self.database_manager.get_user()
-        if row is None:
-            name = input("Enter your name: ")
-            currency = input("Enter your preferable currency: ")
-            balance = self.input_integer("Enter your initial balance: ")
-
-            user_id = self.database_manager.insert_user(name, currency, balance)
-
-            self.user = User(user_id, name, currency, balance)
-        else:
-            self.user = User(row["user_id"],row["username"], row["currency"], row["initial_balance"])
-
 
 
 
@@ -201,15 +173,15 @@ class FinanceManager:
         date = self.input_date("Enter a date (DD/MM/YYYY): ")
         category = self.input_category(transaction_type, "Enter the number from the list: ")
         description = self.input_description("Enter description or leave empty (optional): ")
-        transaction_id = self.generate_id()
-        transaction = Transaction(transaction_id, transaction_type, amount, category, date, description)
+
 
         #Database insertion
         category_id = category.category_id
+        new_id = self.database_manager.add_transaction(transaction_type, amount, category_id, date, description, self.user.user_id)
 
 
         #List insertion
-
+        transaction = Transaction(new_id, transaction_type, amount, category, date, description)
         self.transactions.append(transaction)
 
 
@@ -562,6 +534,45 @@ class FinanceManager:
 
         print("="*95)
 
+
+
+
+    #DATABASE METHODS
+
+        # DatabaseManager helper method
+    def close_database(self):
+        self.database_manager.close_connection()
+
+
+
+    #Method for database to create or load user profile
+
+    def user_handler(self):
+        row = self.database_manager.get_user()
+        if row is None:
+            name = input("Enter your name: ")
+            currency = input("Enter your preferable currency: ")
+            balance = self.input_integer("Enter your initial balance: ")
+
+            user_id = self.database_manager.insert_user(name, currency, balance)
+
+            self.user = User(user_id, name, currency, balance)
+        else:
+            self.user = User(row["user_id"],row["username"], row["currency"], row["initial_balance"])
+
+    def initialize_default_categories(self):
+        self.database_manager.initialize_categories(self.categories, self.user.user_id)
+
+    def load_categories(self):
+        categories = self.database_manager.load_categories(self.user.user_id)
+
+        self.categories.clear()
+        for c in categories:
+            category_id = c["category_id"]
+            category_name = c["category_name"]
+            category_type = c["category_type"]
+            category = Category(category_id, category_name,category_type )
+            self.categories.append(category)
 
 
 
