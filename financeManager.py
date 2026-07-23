@@ -5,6 +5,21 @@ from datetime import datetime
 
 from user import User
 
+DEFAULT_CATEGORIES = [
+    ("Food", "expense"),
+    ("Entertainment", "expense"),
+    ("Transport", "expense"),
+    ("Shopping", "expense"),
+    ("Housing", "expense"),
+    ("Education", "expense"),
+    ("Travel", "expense"),
+    ("Salary", "income"),
+    ("Gift", "income"),
+    ("Bonus", "income"),
+    ("Investment", "income"),
+    ("Freelance", "income"),
+]
+
 
 class FinanceManager:
 
@@ -393,6 +408,36 @@ class FinanceManager:
                     print("Invalid input. Try again")
         return found_category
 
+    def input_category_name(self, text):
+        new_name = ''
+        running = True
+
+        while running:
+            valid = True
+            new_name = input(text).strip().capitalize()
+            if new_name == '':
+                print("Cannot be empty. Try again")
+                continue
+
+            for category in self.categories:
+                if category.category_name == new_name:
+                    print(f"Category '{new_name}' already exists")
+                    valid = False
+                    break
+
+            if valid:
+                running = False
+
+        return new_name
+
+
+
+
+
+
+
+
+
 
     def manage_categories(self):
 
@@ -404,8 +449,6 @@ class FinanceManager:
             print("3. Delete Category")
             print("4. Cancel")
             print()
-
-
             choice = self.input_integer("Enter the number from the menu: ")
 
             match choice:
@@ -414,12 +457,10 @@ class FinanceManager:
                     self.list_categories()
                 case 2:
                     cat_type = self.input_type("Enter category type (Income/Expense): ")
-                    cat_name = input("Enter category name: ")
-                    largest_id = 0
-                    for i in self.categories:
-                        if i.category_id > largest_id:
-                            largest_id = i.category_id
-                    new_id = largest_id +1
+                    cat_name = self.input_category_name("Enter category name: ")
+                    new_id = self.database_manager.add_category(cat_name, cat_type, self.user.user_id)
+
+
                     print(f" Category -> ID: {new_id}| Name: {cat_name}| Type: {cat_type} added")
                     self.categories.append(Category(new_id, cat_name,cat_type))
 
@@ -561,7 +602,7 @@ class FinanceManager:
             self.user = User(row["user_id"],row["username"], row["currency"], row["initial_balance"])
 
     def initialize_default_categories(self):
-        self.database_manager.initialize_categories(self.categories, self.user.user_id)
+        self.database_manager.initialize_categories(DEFAULT_CATEGORIES, self.user.user_id)
 
     def load_categories(self):
         categories = self.database_manager.load_categories(self.user.user_id)

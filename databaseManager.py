@@ -53,17 +53,17 @@ class DatabaseManager:
         self.connection.commit()
 
 
-    def initialize_categories(self, categories, user_id):
+    def initialize_categories(self, default_categories, user_id):
         self.cursor.execute("SELECT COUNT(0) FROM categories WHERE user_id = ?", (user_id,))
         count = self.cursor.fetchone()[0]
 
-        data = [
-            (c.category_name, c.category_type, user_id)
-                for c in categories
-        ]
+        new_data = []
+        for cat_name, cat_type in default_categories:
+            new_data.append((cat_name, cat_type, user_id))
+
 
         if count == 0:
-            self.cursor.executemany("INSERT INTO categories (category_name, category_type, user_id) VALUES (?,?,?)", data)
+            self.cursor.executemany("INSERT INTO categories (category_name, category_type, user_id) VALUES (?,?,?)", new_data)
 
 
             self.connection.commit()
@@ -73,6 +73,20 @@ class DatabaseManager:
         rows = self.cursor.fetchall()
 
         return rows
+
+    def add_category(self, category_name, category_type, user_id):
+        self.cursor.execute("""
+            INSERT into categories (category_name, category_type, user_id) VALUES (?,?,?) """,
+                            (category_name, category_type, user_id))
+
+        self.connection.commit()
+
+        new_id = self.cursor.lastrowid
+
+        return new_id
+
+    def delete_category(self):
+        pass
 
 
     def add_transaction(self, transaction_type, amount, category_id, date, description, user_id ):
