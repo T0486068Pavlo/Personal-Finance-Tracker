@@ -11,6 +11,7 @@ class Menu:
         running = True
         while running:
 
+
             print("PERSONAL FINANCE TRACKER")
             print("1. Add transaction")
             print("2. Delete transaction")

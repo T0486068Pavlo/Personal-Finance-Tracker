@@ -3,6 +3,9 @@ from databaseManager import DatabaseManager
 from category import Category
 from datetime import datetime
 
+from user import User
+
+
 class FinanceManager:
 
     def __init__(self, database_manager):
@@ -21,6 +24,7 @@ class FinanceManager:
                            Category(11, "Investment", "income"),
                            Category(12, "Freelance", "income")]
         self.id = 0
+
 
     #DatabaseManager helper method
     def close_database(self):
@@ -173,6 +177,22 @@ class FinanceManager:
 
         return found
 
+    def user_handler(self):
+        row = self.database_manager.get_user()
+        if row is None:
+            name = input("Enter your name: ")
+            currency = input("Enter your preferable currency: ")
+            balance = self.input_integer("Enter your initial balance: ")
+
+            user_id = self.database_manager.insert_user(name, currency, balance)
+
+            self.user = User(user_id, name, currency, balance)
+        else:
+            self.user = User(row["user_id"],row["username"], row["currency"], row["initial_balance"])
+
+
+
+
 
     #Method that collects all data and creates a transaction object
     def add_transaction(self):
@@ -183,6 +203,12 @@ class FinanceManager:
         description = self.input_description("Enter description or leave empty (optional): ")
         transaction_id = self.generate_id()
         transaction = Transaction(transaction_id, transaction_type, amount, category, date, description)
+
+        #Database insertion
+        category_id = category.category_id
+
+
+        #List insertion
 
         self.transactions.append(transaction)
 
@@ -225,7 +251,6 @@ class FinanceManager:
 
 
     def edit_transaction(self):
-
 
 
         if self.check_if_empty():

@@ -5,6 +5,7 @@ from menu import Menu
 databaseManager = DatabaseManager()
 databaseManager.create_tables()
 financeManager = FinanceManager(databaseManager)
+financeManager.user_handler()
 
 menu = Menu(financeManager)
 

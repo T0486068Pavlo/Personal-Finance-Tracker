@@ -3,6 +3,7 @@ import sqlite3
 class DatabaseManager:
     def __init__(self):
         self.connection = sqlite3.connect("finance.db")
+        self.connection.row_factory = sqlite3.Row
         self.connection.execute("PRAGMA foreign_keys = ON")
         self.cursor = self.connection.cursor()
 
@@ -15,7 +16,7 @@ class DatabaseManager:
                 user_id INTEGER PRIMARY KEY AUTOINCREMENT,
                 username TEXT NOT NULL,
                 currency TEXT NOT NULL,
-                initial_balance REAL NOT NULL
+                initial_balance INTEGER NOT NULL
             )
         """)
 
@@ -33,7 +34,7 @@ class DatabaseManager:
             CREATE TABLE IF NOT EXISTS transactions (
                 transaction_id INTEGER PRIMARY KEY AUTOINCREMENT,
                 transaction_type TEXT NOT NULL,
-                amount REAL NOT NULL,
+                amount INTEGER NOT NULL,
                 category_id INTEGER NOT NULL,
                 date TEXT NOT NULL,
                 description TEXT,
@@ -50,5 +51,30 @@ class DatabaseManager:
 
 
         self.connection.commit()
+
+
+    def add_transaction(self, transaction_type, amount, category_id, date, description, user_id ):
+        pass
+
+
+
+    def get_user(self):
+
+        self.cursor.execute("SELECT * FROM users LIMIT 1")
+        row = self.cursor.fetchone()
+
+
+        return row
+
+    def insert_user(self, username, currency, initial_balance):
+        self.cursor.execute("""
+            INSERT INTO users (username, currency, initial_balance) VALUES (?, ?, ?)""",
+                            (username, currency, initial_balance)
+                            )
+
+        self.connection.commit()
+
+        new_id = self.cursor.lastrowid
+        return new_id
 
 
