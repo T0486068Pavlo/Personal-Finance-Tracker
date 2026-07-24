@@ -1,9 +1,30 @@
 from financeManager import FinanceManager
+
+
 class Menu:
 
 
     def __init__(self, finance_manager):
         self.finance_manager = finance_manager
+
+
+
+    def validate_input(self, text, min_choice, max_choice):
+        choice = ''
+        running = True
+        while running:
+            try:
+                choice = int(input(text))
+                if  choice < min_choice or choice > max_choice:
+                    print(f"Please enter a number in range of {min_choice}-{max_choice}! ")
+                    continue
+                else:
+                    running = False
+            except ValueError:
+                print("Invalid input. Try again")
+
+        return choice
+
 
 
 
@@ -23,7 +44,7 @@ class Menu:
             print("8. Exit")
 
 
-            choice = int(input("Enter your choice: "))
+            choice = self.validate_input("Enter the number from the menu: ",1,8)
 
 
             match choice:
@@ -44,7 +65,6 @@ class Menu:
                     self.finance_manager.show_statistics()
                 case 8:
                     print("Goodbye")
-                    self.finance_manager.close_database()
                     running = False
 
 

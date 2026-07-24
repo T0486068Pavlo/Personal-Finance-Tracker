@@ -28,7 +28,8 @@ class FinanceManager:
         self.database_manager = database_manager
         self.transactions = []
         self.categories = []
-        # self.id = 0
+        self.user = None
+
 
 
 
@@ -113,9 +114,7 @@ class FinanceManager:
             description = ""
         return description
 
-    # def generate_id(self):
-    #     self.id+=1
-    #     return self.id
+
 
     def input_confirmation(self, text):
         valid = False
@@ -161,7 +160,7 @@ class FinanceManager:
     def display_info(self, trans):
         print(f"ID: {trans.transaction_id}")
         print(f"Type: {trans.transaction_type}")
-        print(f"Amount: {trans.amount}")
+        print(f"Amount:{self.user.currency} {trans.amount}")
         print(f"Category: {trans.category}")
         print(f"Date: {trans.date.strftime("%d/%m/%Y")}")
         print(f"Description: {trans.description or "-"}\n")
@@ -185,7 +184,7 @@ class FinanceManager:
     #Method that collects all data and creates a transaction object
     def add_transaction(self):
         transaction_type = self.input_type("Enter transaction type (Income/Expense): ")
-        amount = self.input_integer("Enter amount: £")
+        amount = self.input_integer(f"Enter amount: {self.user.currency}")
         date = self.input_date("Enter a date (DD/MM/YYYY): ")
         category = self.input_category(transaction_type, "Enter the number from the list: ")
         description = self.input_description("Enter description or leave empty (optional): ")
@@ -557,7 +556,6 @@ class FinanceManager:
         print("="*95)
         print(f"Total income: £{total_income}")
         print(f"Total expense: £{total_expense}")
-        print(f"Current balance: £{total_income-total_expense}")
         print(f"Income transactions: {income_transactions}")
         print(f"Expense transactions: {expense_transactions}")
         print()
@@ -605,20 +603,8 @@ class FinanceManager:
 
 
 
-    #Method for database to create or load user profile
 
-    def user_handler(self):
-        row = self.database_manager.get_user()
-        if row is None:
-            name = input("Enter your name: ")
-            currency = input("Enter your preferable currency: ")
-            balance = self.input_integer("Enter your initial balance: ")
 
-            user_id = self.database_manager.insert_user(name, currency, balance)
-
-            self.user = User(user_id, name, currency, balance)
-        else:
-            self.user = User(row["user_id"],row["username"], row["currency"], row["initial_balance"])
 
     def initialize_default_categories(self):
         self.database_manager.initialize_categories(DEFAULT_CATEGORIES, self.user.user_id)
@@ -673,6 +659,18 @@ class FinanceManager:
             category_obj = self.find_category_database(category_id)
             transaction = Transaction(transaction_id, transaction_type, amount,category_obj, date, description)
             self.transactions.append(transaction)
+
+
+    def start_session(self, user):
+        self.user = user
+        self.initialize_default_categories()
+        self.load_categories()
+        self.load_transactions()
+
+    def end_session(self):
+        self.user = None
+        self.categories.clear()
+        self.transactions.clear()
 
 
 

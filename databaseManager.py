@@ -16,7 +16,7 @@ class DatabaseManager:
                 user_id INTEGER PRIMARY KEY AUTOINCREMENT,
                 username TEXT NOT NULL,
                 currency TEXT NOT NULL,
-                initial_balance INTEGER NOT NULL
+                password TEXT NOT NULL
             )
         """)
 
@@ -168,10 +168,10 @@ class DatabaseManager:
 
         return row
 
-    def insert_user(self, username, currency, initial_balance):
+    def insert_user(self, username, currency, password):
         self.cursor.execute("""
-            INSERT INTO users (username, currency, initial_balance) VALUES (?, ?, ?)""",
-                            (username, currency, initial_balance)
+            INSERT INTO users (username, currency, password) VALUES (?, ?, ?)""",
+                            (username, currency, password)
                             )
 
         self.connection.commit()
@@ -179,4 +179,13 @@ class DatabaseManager:
         new_id = self.cursor.lastrowid
         return new_id
 
+
+    def check_login(self, username, password):
+
+        self.cursor.execute("SELECT user_id, username, currency, password FROM users WHERE username = ? AND password = ?",
+                            (username, password))
+
+        row = self.cursor.fetchone()
+
+        return row
 

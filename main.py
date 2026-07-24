@@ -1,18 +1,18 @@
 from databaseManager import DatabaseManager
 from financeManager import FinanceManager
 from menu import Menu
+from sessionManager import SessionManager
 
 databaseManager = DatabaseManager()
 databaseManager.create_tables()
 financeManager = FinanceManager(databaseManager)
-financeManager.user_handler()
-financeManager.initialize_default_categories()
-financeManager.load_categories()
-financeManager.load_transactions()
+
+
 
 menu = Menu(financeManager)
+sessionManager = SessionManager(databaseManager, financeManager, menu)
 
 
 if __name__ == "__main__":
-    menu.run()
+    sessionManager.start()
 
