@@ -2,6 +2,7 @@ from transaction import Transaction
 from databaseManager import DatabaseManager
 from category import Category
 from datetime import datetime
+import sqlite3
 
 from user import User
 
@@ -322,57 +323,69 @@ class FinanceManager:
                               f"Description {find_id.description or "-"}")
                     case 2:
                         find_type = self.input_type("Enter type of the transaction (Income/Expense): ")
+                        found = False
                         for trans in self.transactions:
                             if trans.transaction_type == find_type:
+                                found = True
                                 print(f"ID: {trans.transaction_id}| "
                                       f"Type: {trans.transaction_type}| "
                                       f"Category: {trans.category}| "
                                       f"Amount: {trans.amount}| "
                                       f"Date: {trans.date}| "
                                       f"Description: {trans.description or "-"}")
-                            else:
-                                print(f"No transactions for {find_type}")
+                        if not found:
+                            print(f"No transactions for {find_type}")
+
 
                     case 3:
                         trans_type_find = self.input_type("Enter type of the transaction (Income/Expense): ")
                         find_category = self.input_category(trans_type_find,"Enter category to search for: " )
+                        found = False
                         for trans in self.transactions:
                             if trans.category == find_category:
+                                found = True
                                 print(f"ID: {trans.transaction_id}| "
                                       f"Type: {trans.transaction_type}| "
                                       f"Category: {trans.category}| "
                                       f"Amount: {trans.amount}| "
                                       f"Date: {trans.date}| "
                                       f"Description: {trans.description or "-"}")
-                            else:
-                                print(f"No transactions for {find_category}")
+                        if not found:
+                            print(f"No transactions for {find_category}")
+
 
                     case 4:
                         min_amount = self.input_integer("Enter the minimum amount for range: ")
                         max_amount= self.input_integer("Enter the maximum amount for range: ")
+                        found = False
 
                         for trans in self.transactions:
                             if  min_amount <= trans.amount <= max_amount:
+                                found = True
                                 print(f"ID: {trans.transaction_id}| "
                                       f"Type: {trans.transaction_type}| "
                                       f"Category: {trans.category}| "
                                       f"Amount: {trans.amount}| "
                                       f"Date: {trans.date}| "
                                       f"Description: {trans.description or "-"}")
-                            else:
-                                print("No transaction found")
+                        if not found:
+                            print("No transaction found")
+
                     case 5:
                         find_date = self.input_date("Enter date to find transaction: ")
+                        found = False
                         for trans in self.transactions:
                             if trans.date == find_date:
+                                found = True
                                 print(f"ID: {trans.transaction_id}| "
                                       f"Type: {trans.transaction_type}| "
                                       f"Category: {trans.category}| "
                                       f"Amount: {trans.amount}| "
                                       f"Date: {trans.date}| "
                                       f"Description: {trans.description or "-"}")
-                            else:
-                                print(f"No transaction found for {find_date}")
+                        if not found:
+                            print(f"No transaction found for {find_date}")
+
                     case 6:
                         running = False
 
@@ -468,27 +481,22 @@ class FinanceManager:
 
                 case 3:
                     self.list_categories()
-                    found = False
-                    #here I check if category with entered ID even exists
+
                     category_to_delete = self.find_category_by_id("Enter the ID of category to delete: ")
-                    #here i look through transactions
-                    for transaction in self.transactions:
-                        if transaction.category == category_to_delete:
-                            found = True
 
+                    confirmation = self.input_confirmation("Are you sure to delete (Y/N):  ")
+                    if confirmation:
+                       try:
+                           self.database_manager.delete_category(category_to_delete.category_id)
+                           self.categories.remove(category_to_delete)
+                           print(f"Category '{category_to_delete}' deleted successfully")
+                           self.list_categories()
 
-
-
-
-
-                    if not found:
-                        confirmation = self.input_confirmation("Are you sure to delete (Y/N):  ")
-                        if confirmation:
-                            self.categories.remove(category_to_delete)
-                            self.list_categories()
+                       except sqlite3.IntegrityError:
+                           print("This category cannot be deleted. It contains transactions")
 
                     else:
-                        print("This category contains transaction. Cannot be deleted")
+                        print("Deletion cancelled")
 
 
 
@@ -580,7 +588,7 @@ class FinanceManager:
 
     #DATABASE METHODS
 
-        # DatabaseManager helper method
+    # DatabaseManager helper method
     def close_database(self):
         self.database_manager.close_connection()
 
@@ -614,6 +622,52 @@ class FinanceManager:
             category_type = c["category_type"]
             category = Category(category_id, category_name,category_type )
             self.categories.append(category)
+
+
+    def find_category_database(self, cat_id):
+        found_category = ''
+        if self.categories:
+            valid = False
+            found = False
+            while not valid:
+                try:
+                    for category in self.categories:
+                        if category.category_id == cat_id:
+                            found_category = category
+                            found = True
+                            break
+                    if not found:
+                        print("Category with this ID does not exist")
+                    else:
+                        valid = True
+                except ValueError:
+                    print("Invalid input. Try again")
+        return found_category
+
+
+
+    def load_transactions(self):
+        transactions = self.database_manager.load_transactions(self.user.user_id)
+        self.transactions.clear()
+
+        for t in transactions:
+            transaction_id = t["transaction_id"]
+            transaction_type = t["transaction_type"]
+            amount = t["amount"]
+            category_id = t["category_id"]
+            date= t["date"]
+            description = t["description"]
+
+            date = datetime.strptime(date, "%Y-%m-%d")
+            category_obj = self.find_category_database(category_id)
+            transaction = Transaction(transaction_id, transaction_type, amount,category_obj, date, description)
+            self.transactions.append(transaction)
+
+
+
+
+
+
 
 
 

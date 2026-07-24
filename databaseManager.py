@@ -52,6 +52,7 @@ class DatabaseManager:
 
         self.connection.commit()
 
+#Categories methods
 
     def initialize_categories(self, default_categories, user_id):
         self.cursor.execute("SELECT COUNT(0) FROM categories WHERE user_id = ?", (user_id,))
@@ -85,9 +86,12 @@ class DatabaseManager:
 
         return new_id
 
-    def delete_category(self):
-        pass
+    def delete_category(self, category_id):
+        self.cursor.execute("DELETE FROM categories WHERE category_id = ?",
+                            (category_id,))
+        self.connection.commit()
 
+#Transaction methods
 
     def add_transaction(self, transaction_type, amount, category_id, date, description, user_id ):
         self.cursor.execute("""
@@ -101,7 +105,17 @@ class DatabaseManager:
         return new_id
 
 
+    def load_transactions(self, user_id):
+        self.cursor.execute("SELECT transaction_id, transaction_type, amount, category_id, date, description FROM transactions WHERE user_id = ?",
+                            (user_id,))
+        rows = self.cursor.fetchall()
 
+        return rows
+
+
+
+
+# User methods
 
     def get_user(self):
 
