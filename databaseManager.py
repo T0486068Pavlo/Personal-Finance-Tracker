@@ -121,6 +121,40 @@ class DatabaseManager:
 
 
 
+    def update_transaction_amount(self, new_amount, transaction_id, user_id):
+
+        self.cursor.execute("UPDATE transactions SET amount = ? WHERE transaction_id = ? AND user_id =?",
+                            (new_amount,transaction_id, user_id))
+
+        self.connection.commit()
+
+
+
+    def update_transaction_category(self, new_category_id, transaction_id, user_id):
+        self.cursor.execute("UPDATE transactions SET category_id = ? WHERE transaction_id = ? AND user_id = ?",
+                            (new_category_id, transaction_id, user_id))
+
+        self.connection.commit()
+
+
+    def update_transaction_date(self, new_date, transaction_id, user_id ):
+        self.cursor.execute("UPDATE transactions SET date = ? WHERE transaction_id = ? AND user_id = ?",
+                            (new_date.strftime("%Y-%m-%d"), transaction_id, user_id) )
+
+        self.connection.commit()
+
+
+    def update_transaction_description(self, new_description, transaction_id, user_id):
+        self.cursor.execute("UPDATE transactions SET description = ? WHERE transaction_id = ? AND user_id = ?",
+                            (new_description, transaction_id, user_id))
+
+        self.connection.commit()
+
+
+
+
+
+
 
 
 

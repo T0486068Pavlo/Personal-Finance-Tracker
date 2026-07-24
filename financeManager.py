@@ -272,6 +272,7 @@ class FinanceManager:
                         if new_amount == found_transaction.amount:
                             print("No changes were made")
                         else:
+                            self.database_manager.update_transaction_amount(new_amount, found_transaction.transaction_id, self.user.user_id)
                             found_transaction.amount = new_amount
                             print(f"Amount changed to {new_amount}\n")
                     case 2:
@@ -279,6 +280,7 @@ class FinanceManager:
                         if new_category == found_transaction.category:
                             print("No changes were made")
                         else:
+                            self.database_manager.update_transaction_category(new_category.category_id, found_transaction.transaction_id, self.user.user_id)
                             found_transaction.category = new_category
                             print(f"Category changed to {new_category}\n")
                     case 3:
@@ -286,10 +288,12 @@ class FinanceManager:
                         if new_date == found_transaction.date:
                             print("No changes were made")
                         else:
+                            self.database_manager.update_transaction_date(new_date, found_transaction.transaction_id, self.user.user_id)
                             found_transaction.date = new_date
                             print(f"Date changed to {new_date.strftime("%d/%m/%Y")}\n")
                     case 4:
                         new_description = self.input_description("Enter new description: ")
+                        self.database_manager.update_transaction_description(new_description, found_transaction.transaction_id, self.user.user_id)
                         found_transaction.description = new_description
                         print(f"Description changed to {new_description}\n")
 
