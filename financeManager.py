@@ -229,10 +229,17 @@ class FinanceManager:
 
             confirmation = self.input_confirmation("Please confirm the deletion (Y/N): ")
             if confirmation:
+                self.database_manager.delete_transaction(found_transaction.transaction_id)
                 self.transactions.remove(found_transaction)
-                print(f"Transaction with ID: {found_transaction.transaction_id} from ({found_transaction.transaction_type}) deleted")
+                print(f"Transaction: | ID: {found_transaction.transaction_id}| from ({found_transaction.transaction_type}, £{found_transaction.amount}) deleted")
+                print()
+                self.list_transactions()
             else:
                 print("Deletion cancelled")
+
+
+
+
 
 
 
@@ -662,6 +669,8 @@ class FinanceManager:
             category_obj = self.find_category_database(category_id)
             transaction = Transaction(transaction_id, transaction_type, amount,category_obj, date, description)
             self.transactions.append(transaction)
+
+
 
 
 

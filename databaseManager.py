@@ -113,6 +113,15 @@ class DatabaseManager:
         return rows
 
 
+    def delete_transaction(self, transaction_id):
+        self.cursor.execute("DELETE FROM transactions WHERE transaction_id =?",
+                            (transaction_id,))
+
+        self.connection.commit()
+
+
+
+
 
 
 # User methods
